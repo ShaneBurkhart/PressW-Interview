@@ -54,6 +54,7 @@ Timeboxes
 		- Frontend can call the backend
 		- Frontend renders a button
 		- Button click streams a response from the backend
+		- I do all of these by hand rather than using AI because AI generates the files, it doesn't run the install commands.
 	- 35 mins creating the chat interface and making the request to OpenAI
 		- Stream a hardcoded OpenAI request from the backend
 		- Build the frontend UI for chat interface
@@ -62,3 +63,4 @@ Timeboxes
 	- we'll see how much time I have left
 	- might create the user login
 	- might save each chat to the database
+	- polish and readme
