@@ -1,0 +1,64 @@
+Good morning,
+
+It’s about 8:30am on Tuesday Feb 25th.
+
+I will only spend 2 hours on this project. The initial commit will contain this INIT.txt and the commit will mark the start time. 
+
+I’m going to start by documenting requirements. Then I will create time boxes for checkpoints.
+
+AI tools
+- Cursor
+- Claude
+- I use AI for bulk edits, generating scaffolding, and autocomplete. 
+- I've tried composer but it's a little messy right now. Even with a good design doc.
+
+Architecture
+- Monorepo using Docker Compose
+- FastAPI backend
+- Next.js frontend
+- LangChain and LLM (I’ll use OpenAI)
+- Next.js calls the FastAPI backend directly
+- Postgres database (if time allows)
+
+Requirements
+- Monorepo 
+	- Dockerfiles for each package
+	- Docker Compose to orchestrate them
+	- Add dev tools to Docker Compose
+	- Build and run instructions
+
+- FastAPI Backend
+	- LangChain and LLM (I’ll use OpenAI)
+	- Endpoints with appropriate response statuses
+	- Code formatting with black
+	- Describe auth
+	- Describe deployment
+
+- Next.js Frontend
+	- Next.js, Tailwind, Shadcn
+	- Call the backend and stream the response
+	- Structure the app well
+
+- Design Choices & AI
+	- What tools did I use?
+	- Framework, API choices, frontend state management
+	- Timeboxing explanation
+
+Timeboxes
+- First Hour (8:30am - 9:30am)
+	- 10 mins planning the project
+		- Basic architecture
+		- Defining the problem
+	- 15 mins setting up the project and completing hello world
+		- All services start
+		- Frontend can call the backend
+		- Frontend renders a button
+		- Button click streams a response from the backend
+	- 35 mins creating the chat interface and making the request to OpenAI
+		- Stream a hardcoded OpenAI request from the backend
+		- Build the frontend UI for chat interface
+
+- Second Hour (9:30am - 10:30am)
+	- we'll see how much time I have left
+	- might create the user login
+	- might save each chat to the database
