@@ -1,6 +1,6 @@
 FROM node:20
 
-WORKDIR /app
+WORKDIR /code
 
 # Install dependencies
 COPY package.json package-lock.json ./
