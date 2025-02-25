@@ -5,6 +5,7 @@ C := backend
 all: run
 
 boot:
+	touch .env
 	$(MAKE) build
 	$(MAKE) npm
 	$(MAKE) restart

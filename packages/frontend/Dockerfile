@@ -3,7 +3,7 @@ FROM node:20
 WORKDIR /code
 
 # Install dependencies
-COPY package.json package-lock.json ./
+COPY package*.json ./
 RUN npm install
 
 # Copy application code
