@@ -58,3 +58,5 @@ websockets==15.0
 yarl==1.18.3
 sse-starlette>=1.6.5
 openai==1.64.0
+black==25.1.0
+watchfiles==1.0.4

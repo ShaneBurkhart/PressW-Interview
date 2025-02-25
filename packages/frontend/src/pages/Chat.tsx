@@ -23,13 +23,40 @@ const Chat = ({ data }: ChatProps) => {
   const [loading, setLoading] = useState(false);
   const _cancel = useRef<boolean>(false);
   const _windowScroll = useRef<number>(0);
+  const _lockScroll = useRef<boolean>(false);
+  const _inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const handleScroll = () => {
       _windowScroll.current = window.scrollY;
+      _lockScroll.current = (window.innerHeight + window.scrollY) - 10 <= document.documentElement.scrollHeight;
     };
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // focus the input on any keydown event
+      if (_inputRef.current) {
+        _inputRef.current.focus();
+      }
+
+      // if backspace and command key is pressed, stop the stream
+      if ((e.key === 'Backspace' && (e.metaKey || e.ctrlKey)) || e.key === 'Escape') {
+        e.preventDefault();
+        _cancel.current = true;
+      }
+
+      // // enter or ctrl/cmd + enter
+      // if ((e.key === 'Enter' && !e.shiftKey) || (e.key === 'Enter' && (e.metaKey || e.ctrlKey))) {
+      //   e.preventDefault();
+      //   handleSendMessage();
+      // }
+    };
+    window.addEventListener('keydown', handleKeyDown, { capture: true });
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('keydown', handleKeyDown, { capture: true });
+    };
   }, []);
 
   const handleSendMessage = async () => {
@@ -40,13 +67,6 @@ const Chat = ({ data }: ChatProps) => {
       setLoading(false);
       return;
     }
-
-    setChatInput("");
-    setChatHistory((prev: ChatHistoryMessage[]) => [
-      ...prev, 
-      { role: 'user', content: chatInput },
-      { role: 'assistant', content: '' }
-    ]);
 
     const response = await fetch(`${API_URL}/api/chat`, {
       method: 'POST',
@@ -61,6 +81,25 @@ const Chat = ({ data }: ChatProps) => {
         message: chatInput
       })
     });
+
+    // check for errors
+    if (!response.ok) {
+      setLoading(false);
+      const error = await response.json();
+      toast.error(error.error || "Error sending message");
+      return;
+    }
+
+    setChatInput("");
+    setChatHistory((prev: ChatHistoryMessage[]) => [
+      ...prev, 
+      { role: 'user', content: chatInput },
+      { role: 'assistant', content: '' }
+    ]);
+
+    setTimeout(() => {
+      window.scrollTo(0, document.body.scrollHeight);
+    }, 0);
 
     const reader = response.body?.getReader();
     if (!reader) {
@@ -85,7 +124,7 @@ const Chat = ({ data }: ChatProps) => {
       });
 
       setTimeout(() => {
-        if (_windowScroll.current === window.scrollY) {
+        if (_lockScroll.current) {
           window.scrollTo(0, document.body.scrollHeight);
         }
       }, 0);
@@ -98,7 +137,7 @@ const Chat = ({ data }: ChatProps) => {
     <div className="max-w-[800px] mx-auto">
       <div className="flex flex-col h-screen p-4">
         <div className="flex-1 space-y-4 pb-4">
-          {chatHistory.map((msg, i) => (
+          {chatHistory.length > 0 ? chatHistory.map((msg, i) => (
             <div key={i} className="flex gap-3 p-4 border rounded-lg">
               <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground">
                 {msg.role === 'user' ? 'U' : 'A'}
@@ -110,7 +149,11 @@ const Chat = ({ data }: ChatProps) => {
                 <p className="mt-1">{msg.content}</p>
               </div>
             </div>
-          ))}
+          )) : (
+            <div className="flex justify-center items-center h-full">
+              <p className="text-sm text-muted-foreground">How can I help you today?</p>
+            </div>
+          )}
         </div>
 
         <div className="border-t py-4 sticky bottom-0 bg-background">
@@ -122,6 +165,7 @@ const Chat = ({ data }: ChatProps) => {
             className="flex gap-2"
           >
             <input
+              ref={_inputRef}
               type="text"
               placeholder="Type your message..."
               value={chatInput}

@@ -4,7 +4,6 @@ from fastapi.responses import StreamingResponse, JSONResponse
 import asyncio
 import openai
 
-
 app = FastAPI()
 
 # Configure CORS
@@ -16,9 +15,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @app.get("/health")
 async def health():
     return {"status": "ok"}
+
 
 @app.post("/api/chat")
 async def chat_endpoint(request: Request):
@@ -34,31 +35,29 @@ async def chat_endpoint(request: Request):
     if not history:
         # Return a 400 error
         return JSONResponse(status_code=400, content={"error": "Chat history is empty"})
-    
+
     if len(history) == 0:
         # Return a 400 error
         return JSONResponse(status_code=400, content={"error": "Chat history is empty"})
-    
+
     # If last message is not a user message, return a 400 error
     if history[-1]["role"] != "user":
-        return JSONResponse(status_code=400, content={"error": "Last message is not a user message"})
-    
+        return JSONResponse(
+            status_code=400, content={"error": "Last message is not a user message"}
+        )
+
     cleaned_history = [
-        {
-            "role": message["role"],
-            "content": message["content"]
-        }
-        for message in history
+        {"role": message["role"], "content": message["content"]} for message in history
     ]
 
     async def generate():
         try:
             # Initialize OpenAI client
             client = openai.AsyncOpenAI()
-            
+
             # Create a chat completion with streaming
             stream = await client.chat.completions.create(
-                model="gpt-4o-mini",  
+                model="gpt-4o-mini",
                 messages=cleaned_history,
                 stream=True,
                 temperature=0.8,
@@ -72,12 +71,12 @@ async def chat_endpoint(request: Request):
         except Exception as e:
             yield f"Error: {str(e)}"
 
-    return StreamingResponse(generate(), media_type='text/event-stream', headers=headers)
+    return StreamingResponse(
+        generate(), media_type="text/event-stream", headers=headers
+    )
 
-@app.get("/api/load")
-async def load_endpoint():
-    return {"message": "Hello, World!"}
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=8000)

@@ -31,6 +31,14 @@ services:
       - .env
     command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
   
+  black_formatter:
+    build:
+      context: ./packages/backend
+      dockerfile: Dockerfile
+    volumes:
+      - ./packages/backend:/code
+    command: ["watchfiles", "black /code", "/code"]
+  
   dozzle:
     image: amir20/dozzle:latest
     ports:
