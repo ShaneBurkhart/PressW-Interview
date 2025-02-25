@@ -4,6 +4,11 @@ C := backend
 
 all: run
 
+boot:
+	$(MAKE) build
+	$(MAKE) npm
+	$(MAKE) restart
+
 build:
 	docker compose build
 
