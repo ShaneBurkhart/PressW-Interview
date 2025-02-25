@@ -1,6 +1,6 @@
-from fastapi import FastAPI, Response
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, JSONResponse
 import asyncio
 import openai
 
@@ -20,13 +20,36 @@ app.add_middleware(
 async def health():
     return {"status": "ok"}
 
-@app.get("/api/test")
-async def test_endpoint():
+@app.post("/api/chat")
+async def chat_endpoint(request: Request):
     headers = {
         "Access-Control-Allow-Origin": "*",  # In production, replace with specific origins
         "Cache-Control": "no-cache",
         "Connection": "keep-alive",
     }
+
+    # Make sure chat history is not empty
+    data = await request.json()
+    history = data.get("history")
+    if not history:
+        # Return a 400 error
+        return JSONResponse(status_code=400, content={"error": "Chat history is empty"})
+    
+    if len(history) == 0:
+        # Return a 400 error
+        return JSONResponse(status_code=400, content={"error": "Chat history is empty"})
+    
+    # If last message is not a user message, return a 400 error
+    if history[-1]["role"] != "user":
+        return JSONResponse(status_code=400, content={"error": "Last message is not a user message"})
+    
+    cleaned_history = [
+        {
+            "role": message["role"],
+            "content": message["content"]
+        }
+        for message in history
+    ]
 
     async def generate():
         try:
@@ -36,12 +59,9 @@ async def test_endpoint():
             # Create a chat completion with streaming
             stream = await client.chat.completions.create(
                 model="gpt-4o-mini",  
-                messages=[
-                    {"role": "system", "content": "You are a helpful assistant."},
-                    {"role": "user", "content": "Tell me an interesting story about technology, one sentence at a time."}
-                ],
+                messages=cleaned_history,
                 stream=True,
-                temperature=0.7,
+                temperature=0.8,
             )
 
             # Stream the response

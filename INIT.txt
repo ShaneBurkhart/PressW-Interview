@@ -59,7 +59,12 @@ Timeboxes
 		- Stream a hardcoded OpenAI request from the backend
 		- Build the frontend UI for chat interface
 
+UPDATE - I'm a little past the first hour. I have the chat interface working. The resopnse is being streamed from the backend.
+- I need to spend some time on edge cases and UI
+
 - Second Hour (9:30am - 10:30am)
+	- 20 mins polishing the UI and fixing edge cases
+
 	- we'll see how much time I have left
 	- might create the user login
 	- might save each chat to the database
