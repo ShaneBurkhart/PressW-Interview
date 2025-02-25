@@ -63,10 +63,10 @@ UPDATE - I'm a little past the first hour. I have the chat interface working. Th
 - I need to spend some time on edge cases and UI
 
 - Second Hour (9:30am - 10:30am)
-	- 40 mins polishing the UI and fixing edge cases
-	- 20 mins on running from nothing
-
 	- we'll see how much time I have left
+	- 40 mins polishing the UI and fixing edge cases
+	- 20 mins on running from scratch, polish and readme
+
+- Didn't get to these
 	- might create the user login
 	- might save each chat to the database
-	- polish and readme

@@ -7,7 +7,7 @@ export default async function Home() {
 
   return (
     <>
-      <Chat data={{}} />
+      <Chat />
       <Toaster />
     </>
   );
