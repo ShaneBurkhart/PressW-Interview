@@ -7,17 +7,17 @@ import { Button } from "@/components/ui/button";
 
 const API_URL = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL;
 
-interface ChatProps {
+// interface ChatProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  data: any;
-}
+  // data: any;
+// }
 
 interface ChatHistoryMessage {
   role: string;
   content: string;
 }
 
-const Chat = ({ data }: ChatProps) => {
+const Chat = () => {
   const [chatHistory, setChatHistory] = useState<ChatHistoryMessage[]>([]);
   const [chatInput, setChatInput] = useState("");
   const [loading, setLoading] = useState(false);
