@@ -1,6 +1,9 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse, JSONResponse
+from langchain_openai import ChatOpenAI
+from langchain.callbacks import AsyncIteratorCallbackHandler
+from langchain.schema import HumanMessage, AIMessage, SystemMessage
 import asyncio
 import openai
 
@@ -52,22 +55,33 @@ async def chat_endpoint(request: Request):
 
     async def generate():
         try:
-            # Initialize OpenAI client
-            client = openai.AsyncOpenAI()
-
-            # Create a chat completion with streaming
-            stream = await client.chat.completions.create(
+            callback = AsyncIteratorCallbackHandler()
+            model = ChatOpenAI(
                 model="gpt-4o-mini",
-                messages=cleaned_history,
-                stream=True,
+                streaming=True,
                 temperature=0.8,
+                callbacks=[callback],
             )
 
-            # Stream the response
-            async for chunk in stream:
-                if chunk.choices[0].delta.content is not None:
-                    yield chunk.choices[0].delta.content
-                    await asyncio.sleep(0.1)
+            # Convert history to LangChain message format
+            messages = []
+            for msg in history:
+                if msg["role"] == "user":
+                    messages.append(HumanMessage(content=msg["content"]))
+                elif msg["role"] == "assistant":
+                    messages.append(AIMessage(content=msg["content"]))
+                elif msg["role"] == "system":
+                    messages.append(SystemMessage(content=msg["content"]))
+
+            # Start the streaming generation
+            task = asyncio.create_task(model.agenerate([messages]))
+
+            async for token in callback.aiter():
+                yield token
+                await asyncio.sleep(0.1)
+
+            await task  # Ensure the generation completes
+
         except Exception as e:
             yield f"Error: {str(e)}"
 
