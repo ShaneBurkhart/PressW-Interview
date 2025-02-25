@@ -1,3 +1,7 @@
+## Work Log
+
+Before starting, I created `INIT.txt` which contains all of my initial thoughts. I also updated it along the way.
+
 ## First Command to Run
 
 ``` bash

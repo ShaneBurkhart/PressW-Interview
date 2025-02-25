@@ -70,3 +70,6 @@ UPDATE - I'm a little past the first hour. I have the chat interface working. Th
 - Didn't get to these
 	- might create the user login
 	- might save each chat to the database
+
+- I went a little over 2 hours because as I was checking, I realized I needed to use LangChain.
+- This took just a few minutes to install and migrate my existing code.
