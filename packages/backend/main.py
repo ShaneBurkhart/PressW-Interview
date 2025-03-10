@@ -76,14 +76,23 @@ async def chat_endpoint(request: Request):
             # Start the streaming generation
             task = asyncio.create_task(model.agenerate([messages]))
 
-            async for token in callback.aiter():
-                yield token
-                await asyncio.sleep(0.1)
+            try:
+                async for token in callback.aiter():
+                    yield token
+                    # await asyncio.sleep(0.2)
 
-            await task  # Ensure the generation completes
+                await task  # Ensure the generation completes
+            except asyncio.CancelledError:
+                # Handle cancellation gracefully
+                await task  # Make sure to await cancelled task
+                return
+            except Exception as e:
+                yield f"Error during streaming: {str(e)}"
+                return
 
         except Exception as e:
-            yield f"Error: {str(e)}"
+            yield f"Error during setup: {str(e)}"
+            return
 
     return StreamingResponse(
         generate(), media_type="text/event-stream", headers=headers
